@@ -1,3 +1,3 @@
 class FactoryBase
-  include ActiveModel::Validations
+  include DefineAttributes
 end

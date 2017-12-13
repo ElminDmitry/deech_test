@@ -1,0 +1,3 @@
+class PageRepository < RepositoryBase
+
+end
