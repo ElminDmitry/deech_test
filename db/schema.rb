@@ -27,13 +27,14 @@ ActiveRecord::Schema.define(version: 20171213111914) do
   end
 
   create_table "attribute_values", force: :cascade do |t|
-    t.integer "page_id"
+    t.integer "resource_id"
+    t.string "resource_type"
     t.integer "attribute_id"
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["attribute_id"], name: "index_attribute_values_on_attribute_id"
-    t.index ["page_id"], name: "index_attribute_values_on_page_id"
+    t.index ["resource_type", "resource_id"], name: "index_attribute_values_on_resource_type_and_resource_id"
   end
 
   create_table "attributes", force: :cascade do |t|
