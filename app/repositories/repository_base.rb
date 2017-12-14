@@ -4,34 +4,44 @@ class RepositoryBase
   attr_accessor :resource
 
   def initialize(resource)
-  	@resource = resource
+    @resource = resource
   end
 
   def save(params)
-  	page = resource.page
-    page.attribute_values.map do |attr_|
-      attr_name = attr_.page_attribute.name.to_sym
-      attr_.value = params[attr_name]
+    wrapper do
+      ->(attr_, attr_name) { attr_.value = params[attr_name] }
     end
-  	page.save
   end
 
-  # TODO: implement following logic
   def update(params)
-  	page = resource.page
-    page.attribute_values.map do |attr_|
-      attr_name = attr_.page_attribute.name.to_sym
-      attr_.update(value: params[attr_name])
+    wrapper do
+      ->(attr_, attr_name) { attr_.update(value: params[attr_name]) }
     end
-  	page.save
   end
 
   def delete
-  	page = resource.page
+    wrapper do
+      ->(attr_, _attr_name) { attr_.destroy }
+    end
+  end
+
+  private
+
+  def wrapper(return_flag: 'status')
+    page = resource.page
     page.attribute_values.map do |attr_|
       attr_name = attr_.page_attribute.name.to_sym
-      attr_.destroy
+      yield.call(attr_, attr_name)
     end
-  	resource
+    method_return(return_flag, page)
+  end
+
+  def method_return(return_flag, page)
+    case return_flag
+    when 'status'
+      page.save
+    when 'resource'
+      resource
+    end
   end
 end
