@@ -1,37 +1,47 @@
 class RepositoryBase
   include ActiveModel::Validations
 
-  attr_accessor :resource
+  attr_accessor :obj
 
-  def initialize(resource)
-  	@resource = resource
+  def initialize(obj)
+    @obj = obj
   end
 
   def save(params)
-  	page = resource.page
-    page.attribute_values.map do |attr_|
-      attr_name = attr_.page_attribute.name.to_sym
-      attr_.value = params[attr_name]
+    wrapper do
+      ->(attr_, attr_name) { attr_.value = params[attr_name] }
     end
-  	page.save
   end
 
-  # TODO: implement following logic
   def update(params)
-  	page = resource.page
-    page.attribute_values.map do |attr_|
-      attr_name = attr_.page_attribute.name.to_sym
-      attr_.update(value: params[attr_name])
+    wrapper do
+      ->(attr_, attr_name) { attr_.update(value: params[attr_name]) }
     end
-  	page.save
   end
 
   def delete
-  	page = resource.page
-    page.attribute_values.map do |attr_|
-      attr_name = attr_.page_attribute.name.to_sym
-      attr_.destroy
+    wrapper(return_flag: 'obj') do
+      ->(attr_, _attr_name) { attr_.destroy }
     end
-  	resource
+  end
+
+  private
+
+  def wrapper(return_flag: 'status')
+    resource_obj = obj.resource
+    resource_obj.attribute_values.map do |attr_|
+      attr_name = attr_.resource_attribute.name.to_sym
+      yield.call(attr_, attr_name)
+    end
+    method_return(return_flag, resource_obj)
+  end
+
+  def method_return(return_flag, resource_obj)
+    case return_flag
+    when 'status'
+      resource_obj.save
+    when 'obj'
+      obj
+    end
   end
 end

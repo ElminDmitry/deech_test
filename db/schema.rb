@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171213111914) do
+ActiveRecord::Schema.define(version: 20171214125901) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
@@ -26,14 +26,21 @@ ActiveRecord::Schema.define(version: 20171213111914) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
+  create_table "articles", force: :cascade do |t|
+    t.string "article_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "attribute_values", force: :cascade do |t|
-    t.integer "page_id"
+    t.integer "resource_id"
+    t.string "resource_type"
     t.integer "attribute_id"
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["attribute_id"], name: "index_attribute_values_on_attribute_id"
-    t.index ["page_id"], name: "index_attribute_values_on_page_id"
+    t.index ["resource_type", "resource_id"], name: "index_attribute_values_on_resource_type_and_resource_id"
   end
 
   create_table "attributes", force: :cascade do |t|
